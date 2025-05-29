@@ -6,15 +6,16 @@ import matplotlib.pyplot as plt
 st.set_page_config(layout="wide")
 st.title("Dashboard de Préstamos - Ximple")
 
-# Carga de datos
+# Carga de datos con caché
 @st.cache_data
 def load_data():
-    return pd.read_csv("C:\Users\A01658906\Desktop\DataVisualiza\df_merged (1).csv")
+    return pd.read_csv(r"C:\Users\A01658906\Desktop\DataVisualiza\df_merged (1).csv")
 
+# Llamar a la función
 df = load_data()
 
 # Filtros en la barra lateral
-st.sidebar.header(" Filtros")
+st.sidebar.header("Filtros")
 
 # Filtro por Año
 if "IssueYear" in df.columns:
@@ -34,8 +35,8 @@ if "canal_ajustado" in df.columns:
     selected_channels = st.sidebar.multiselect("Selecciona Canal(es):", canales, default=canales)
     df = df[df["canal_ajustado"].isin(selected_channels)]
 
-# Vista previa
-st.subheader(" Vista Previa de los Datos Filtrados")
+# Vista previa de datos filtrados
+st.subheader("Vista Previa de los Datos Filtrados")
 st.dataframe(df.head())
 
 # Visualización 1: Participación de Préstamos por Canal
@@ -52,20 +53,20 @@ if "canal_ajustado" in df.columns:
     ax1.tick_params(axis='x', rotation=45)
     st.pyplot(fig1)
 
-# Visualización 2: Participación de Préstamos por Región
+# Visualización 2: Participación de Préstamos por Región (Gráfico de pastel)
 st.markdown("---")
-st.subheader(" Participación de Préstamos por Región")
+st.subheader("Participación de Préstamos por Región")
 
 if "customer_region" in df.columns:
     region_counts = df["customer_region"].value_counts()
     fig2, ax2 = plt.subplots()
     ax2.pie(region_counts, labels=region_counts.index, autopct='%1.1f%%', startangle=90)
-    ax2.axis('equal')
+    ax2.axis('equal')  # Para que sea un círculo
     st.pyplot(fig2)
 
-# Visualización 3: Distribución por Región (Barra horizontal)
+# Visualización 3: Distribución de Préstamos por Región (Barra horizontal)
 st.markdown("---")
-st.subheader(" Distribución de Préstamos por Región")
+st.subheader("Distribución de Préstamos por Región")
 
 if "customer_region" in df.columns:
     fig3, ax3 = plt.subplots()
@@ -75,9 +76,9 @@ if "customer_region" in df.columns:
     ax3.set_ylabel("Región")
     st.pyplot(fig3)
 
-# Visualización 4: Monto promedio por tipo de cliente y tipo de préstamo
+# Visualización 4: Monto promedio por Cliente y Tipo de Préstamo
 st.markdown("---")
-st.subheader(" Monto Promedio por Cliente y Tipo de Préstamo")
+st.subheader("Monto Promedio por Cliente y Tipo de Préstamo")
 
 if all(col in df.columns for col in ['LoanAmount', 'RecipientType', 'LoanType']):
     avg_amount = df.groupby(['RecipientType', 'LoanType'])['LoanAmount'].mean().reset_index()
